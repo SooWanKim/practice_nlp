@@ -163,7 +163,7 @@ model = keras.Model(inputs=inputs, outputs=outputs)
 """
 
 model.compile("adam", "sparse_categorical_crossentropy", metrics=["accuracy"])
-history = model.fit(x_train, y_train, batch_size=32, epochs=1, validation_data=(x_val, y_val))
+history = model.fit(x_train, y_train, batch_size=32, epochs=3, validation_data=(x_val, y_val))
 
 
 
@@ -189,7 +189,7 @@ def sentiment_predict(new_sentence, word_index, model):
 
     pad_new = pad_sequences(encoded, maxlen=maxlen)  # 패딩
     print(model.predict(pad_new))
-    score = float(model.predict(pad_new))  # 예측
+    score = float(model.predict(pad_new)[0][0])  # 예측
     if score > 0.5:
         print("{:.2f}% 확률로 긍정 리뷰입니다.\n".format(score * 100))
     else:
