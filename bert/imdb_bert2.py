@@ -167,13 +167,12 @@ tokenizer.enable_truncation(MAX_SEQ_LEN - 2)
 X_train = convert_sentences_to_features(reviews[:40000], tokenizer)
 X_test = convert_sentences_to_features(reviews[40000:], tokenizer)
 
-
-one_hot_encoded = to_categorical(y)
+# one_hot_encoded = to_categorical(y)
 one_hot_encoded = tf.one_hot(y, 1)
 y_train = one_hot_encoded[:40000]
 y_test = one_hot_encoded[40000:]
 
-BATCH_SIZE = 8
+BATCH_SIZE = 30
 EPOCHS = 1
 
 # Use Adam optimizer to minimize the categorical_crossentropy loss
