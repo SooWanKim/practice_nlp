@@ -154,8 +154,6 @@ y = movie_reviews["sentiment"]
 
 y = np.array(list(map(lambda x: 1 if x == "positive" else 0, y)))
 
-masks = tf.one_hot(y, 1)
-
 slow_tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
 save_path = "bert_base_uncased/"
 if not os.path.exists(save_path):
@@ -169,7 +167,9 @@ tokenizer.enable_truncation(MAX_SEQ_LEN - 2)
 X_train = convert_sentences_to_features(reviews[:40000], tokenizer)
 X_test = convert_sentences_to_features(reviews[40000:], tokenizer)
 
+
 one_hot_encoded = to_categorical(y)
+one_hot_encoded = tf.one_hot(y, 1)
 y_train = one_hot_encoded[:40000]
 y_test = one_hot_encoded[40000:]
 
@@ -178,16 +178,10 @@ EPOCHS = 1
 
 # Use Adam optimizer to minimize the categorical_crossentropy loss
 opt = Adam(learning_rate=2e-5)
-model.compile(optimizer=opt,
-              loss='binary_crossentropy',
-              metrics=['accuracy'])
+model.compile(optimizer=opt, loss="binary_crossentropy", metrics=["accuracy"])
 
 # Fit the data to the model
-history = model.fit(X_train, y_train,
-                    validation_data=(X_test, y_test),
-                    epochs=EPOCHS,
-                    batch_size=BATCH_SIZE,
-                    verbose = 1)
+history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=1)
 
 # Save the trained model
 # model.save('nlp_model.h5')
