@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import bert
+# import bert
 import tensorflow as tf
 import tensorflow_hub as hub
 from tensorflow.keras.utils import to_categorical
@@ -72,12 +72,12 @@ def convert_sentences_to_features(sentences, tokenizer):
     return [np.asarray(input_ids, dtype=np.int32), np.asarray(input_masks, dtype=np.int32), np.asarray(input_segments, dtype=np.int32)]
 
 
-def create_tonkenizer(bert_layer):
-    """Instantiate Tokenizer with vocab"""
-    vocab_file = bert_layer.resolved_object.vocab_file.asset_path.numpy()
-    do_lower_case = bert_layer.resolved_object.do_lower_case.numpy()
-    tokenizer = bert.bert_tokenization.FullTokenizer(vocab_file, do_lower_case)
-    return tokenizer
+# def create_tonkenizer(bert_layer):
+#     """Instantiate Tokenizer with vocab"""
+#     vocab_file = bert_layer.resolved_object.vocab_file.asset_path.numpy()
+#     do_lower_case = bert_layer.resolved_object.do_lower_case.numpy()
+#     tokenizer = bert.bert_tokenization.FullTokenizer(vocab_file, do_lower_case)
+#     return tokenizer
 
 
 def nlp_model(callable_object):
