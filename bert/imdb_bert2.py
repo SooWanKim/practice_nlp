@@ -15,7 +15,7 @@ from tokenizers import BertWordPieceTokenizer
 from transformers import BertTokenizer, TFBertModel, BertConfig
 
 
-MAX_SEQ_LEN = 500  # max sequence length
+MAX_SEQ_LEN = 300  # max sequence length
 
 
 def get_masks(tokens):
@@ -164,15 +164,23 @@ slow_tokenizer.save_pretrained(save_path)
 tokenizer = BertWordPieceTokenizer("bert_base_uncased/vocab.txt", lowercase=True)
 tokenizer.enable_truncation(MAX_SEQ_LEN - 2)
 
-X_train = convert_sentences_to_features(reviews[:40000], tokenizer)
-X_test = convert_sentences_to_features(reviews[40000:], tokenizer)
+train_count = 10000 # 40000
+test_count = 2000 #
+
+# X_train = convert_sentences_to_features(reviews[:40000], tokenizer)
+# X_test = convert_sentences_to_features(reviews[40000:], tokenizer)
+
+X_train = convert_sentences_to_features(reviews[:train_count], tokenizer)
+X_test = convert_sentences_to_features(reviews[train_count:train_count+test_count], tokenizer)
 
 # one_hot_encoded = to_categorical(y)
 one_hot_encoded = tf.one_hot(y, 1)
-y_train = one_hot_encoded[:40000]
-y_test = one_hot_encoded[40000:]
+# y_train = one_hot_encoded[:40000]
+# y_test = one_hot_encoded[40000:]
+y_train = one_hot_encoded[:train_count]
+y_test = one_hot_encoded[train_count:train_count + test_count]
 
-BATCH_SIZE = 30
+BATCH_SIZE = 64
 EPOCHS = 1
 
 # Use Adam optimizer to minimize the categorical_crossentropy loss
@@ -187,4 +195,4 @@ history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=E
 
 pred_test = np.argmax(model.predict(X_test), axis=1)
 print(pred_test[:10])
-print(reviews[40000:40010])
+# print(reviews[40000:40010])
