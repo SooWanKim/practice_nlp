@@ -97,7 +97,7 @@ def nlp_model(callable_object):
     x = Dropout(0.1)(x)
 
     # Add output layer
-    outputs = Dense(1, activation="sigmoid")(x)
+    outputs = Dense(2, activation="softmax")(x)
 
     # Construct a new model
     model = Model(inputs=inputs, outputs=outputs)
@@ -164,7 +164,7 @@ slow_tokenizer.save_pretrained(save_path)
 tokenizer = BertWordPieceTokenizer("bert_base_uncased/vocab.txt", lowercase=True)
 tokenizer.enable_truncation(MAX_SEQ_LEN - 2)
 
-train_count = 10000 # 40000
+train_count = 40000 # 40000
 test_count = 2000 #
 
 # X_train = convert_sentences_to_features(reviews[:40000], tokenizer)
@@ -173,21 +173,23 @@ test_count = 2000 #
 X_train = convert_sentences_to_features(reviews[:train_count], tokenizer)
 X_test = convert_sentences_to_features(reviews[train_count:train_count+test_count], tokenizer)
 
-# one_hot_encoded = to_categorical(y)
-one_hot_encoded = tf.one_hot(y, 1)
+one_hot_encoded = to_categorical(y)
+# one_hot_encoded = tf.one_hot(y, 1)
+
 # y_train = one_hot_encoded[:40000]
 # y_test = one_hot_encoded[40000:]
+
 y_train = one_hot_encoded[:train_count]
 y_test = one_hot_encoded[train_count:train_count + test_count]
 
-BATCH_SIZE = 64
+BATCH_SIZE = 8
 EPOCHS = 1
 
-# Use Adam optimizer to minimize the categorical_crossentropy loss
 opt = Adam(learning_rate=2e-5)
-model.compile(optimizer=opt, loss="binary_crossentropy", metrics=["accuracy"])
+model.compile(optimizer=opt, loss="categorical_crossentropy", metrics=["accuracy"])
 
 # Fit the data to the model
+# history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=1)
 history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=1)
 
 # Save the trained model
