@@ -180,3 +180,17 @@ history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=E
 pred_test = np.argmax(model.predict(X_test), axis=1)
 print(pred_test[:10])
 # print(reviews[40000:40010])
+
+
+def sentiment_predict(sentence, tokenizer):
+    x_test = convert_sentences_to_features(sentence, tokenizer)
+    pred = np.argmax(model.predict(x_test), axis=1)
+    print('\n')
+    print(pred)
+
+    for score in pred:
+        score = float(score)  # 예측
+        if score > 0.0:
+            print("긍정 리뷰입니다.\n")
+        else:
+            print("부정 리뷰입니다.\n")
