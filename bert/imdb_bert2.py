@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-# import bert
 import tensorflow as tf
 import tensorflow_hub as hub
 from tensorflow.keras.utils import to_categorical
@@ -43,10 +42,6 @@ def get_ids(tokens, ids):
 
 def create_single_input(sentence, tokenizer, max_len):
     """Create an input from a sentence"""
-    # stokens = tokenizer.tokenize(sentence)
-    # stokens = stokens[:max_len]
-    # stokens = ["[CLS]"] + stokens + ["[SEP]"]
-
     encoded = tokenizer.encode(sentence)
 
     ids = get_ids(encoded.tokens, encoded.ids)
@@ -70,14 +65,6 @@ def convert_sentences_to_features(sentences, tokenizer):
         input_segments.append(segments)
 
     return [np.asarray(input_ids, dtype=np.int32), np.asarray(input_masks, dtype=np.int32), np.asarray(input_segments, dtype=np.int32)]
-
-
-# def create_tonkenizer(bert_layer):
-#     """Instantiate Tokenizer with vocab"""
-#     vocab_file = bert_layer.resolved_object.vocab_file.asset_path.numpy()
-#     do_lower_case = bert_layer.resolved_object.do_lower_case.numpy()
-#     tokenizer = bert.bert_tokenization.FullTokenizer(vocab_file, do_lower_case)
-#     return tokenizer
 
 
 def nlp_model(callable_object):
@@ -104,7 +91,6 @@ def nlp_model(callable_object):
     return model
 
 
-# model = nlp_model("https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/1")
 model = nlp_model("https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/2")
 model.summary()
 
@@ -114,7 +100,6 @@ movie_reviews.head(5)
 movie_reviews = movie_reviews.sample(frac=1)
 
 print(movie_reviews.isnull().values.any())
-
 print(movie_reviews.shape)
 
 
@@ -147,7 +132,6 @@ for sen in sentences:
     reviews.append(preprocess_text(sen))
 
 print(movie_reviews.columns.values)
-
 print(movie_reviews.sentiment.unique())
 
 y = movie_reviews["sentiment"]
@@ -188,8 +172,6 @@ EPOCHS = 1
 opt = Adam(learning_rate=2e-5)
 model.compile(optimizer=opt, loss="categorical_crossentropy", metrics=["accuracy"])
 
-# Fit the data to the model
-# history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=1)
 history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=EPOCHS, batch_size=BATCH_SIZE, verbose=1)
 
 # Save the trained model
