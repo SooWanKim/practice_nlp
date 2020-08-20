@@ -6,12 +6,13 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Dense, Dropout
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
+
+# from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from tqdm import tqdm
 import re
 import os
 from tokenizers import BertWordPieceTokenizer
-from transformers import BertTokenizer, TFBertModel, BertConfig
+from transformers import BertTokenizer
 
 
 MAX_SEQ_LEN = 300  # max sequence length
@@ -33,18 +34,18 @@ def get_segments(tokens):
     return segments + [0] * (MAX_SEQ_LEN - len(tokens))
 
 
-def get_ids(tokens, ids):
+def get_ids(ids):
     """Token ids from Tokenizer vocab"""
     token_ids = ids
     input_ids = token_ids + [0] * (MAX_SEQ_LEN - len(token_ids))
     return input_ids
 
 
-def create_single_input(sentence, tokenizer, max_len):
+def create_single_input(sentence, tokenizer):
     """Create an input from a sentence"""
     encoded = tokenizer.encode(sentence)
 
-    ids = get_ids(encoded.tokens, encoded.ids)
+    ids = get_ids(encoded.ids)
     masks = get_masks(encoded.tokens)
     segments = get_segments(encoded.tokens)
 
@@ -56,7 +57,7 @@ def convert_sentences_to_features(sentences, tokenizer):
     input_ids, input_masks, input_segments = [], [], []
 
     for sentence in tqdm(sentences, position=0, leave=True):
-        ids, masks, segments = create_single_input(sentence, tokenizer, MAX_SEQ_LEN - 2)
+        ids, masks, segments = create_single_input(sentence, tokenizer)
         assert len(ids) == MAX_SEQ_LEN
         assert len(masks) == MAX_SEQ_LEN
         assert len(segments) == MAX_SEQ_LEN
@@ -148,14 +149,14 @@ slow_tokenizer.save_pretrained(save_path)
 tokenizer = BertWordPieceTokenizer("bert_base_uncased/vocab.txt", lowercase=True)
 tokenizer.enable_truncation(MAX_SEQ_LEN - 2)
 
-train_count = 40000 # 40000
-test_count = 2000 #
+train_count = 40000  # 40000
+test_count = 2000  #
 
 # X_train = convert_sentences_to_features(reviews[:40000], tokenizer)
 # X_test = convert_sentences_to_features(reviews[40000:], tokenizer)
 
 X_train = convert_sentences_to_features(reviews[:train_count], tokenizer)
-X_test = convert_sentences_to_features(reviews[train_count:train_count+test_count], tokenizer)
+X_test = convert_sentences_to_features(reviews[train_count : train_count + test_count], tokenizer)
 
 one_hot_encoded = to_categorical(y)
 # one_hot_encoded = tf.one_hot(y, 1)
@@ -164,7 +165,7 @@ one_hot_encoded = to_categorical(y)
 # y_test = one_hot_encoded[40000:]
 
 y_train = one_hot_encoded[:train_count]
-y_test = one_hot_encoded[train_count:train_count + test_count]
+y_test = one_hot_encoded[train_count : train_count + test_count]
 
 BATCH_SIZE = 8
 EPOCHS = 1
@@ -185,7 +186,7 @@ print(pred_test[:10])
 def sentiment_predict(sentence, tokenizer):
     x_test = convert_sentences_to_features(sentence, tokenizer)
     pred = np.argmax(model.predict(x_test), axis=1)
-    print('\n')
+    print("\n")
     print(pred)
 
     for score in pred:
